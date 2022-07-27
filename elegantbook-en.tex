@@ -6,10 +6,10 @@
 
 
 \title{CLRS Notes}
-\subtitle{Classic Elegant\LaTeX{} Template}
+\subtitle{MIT 6.046J}
 
 \author{Haopeng Li}
-\institute{Elegant\LaTeX{} Program}
+%\institute{Elegant\LaTeX{} Program}
 \date{\today}
 %\bioinfo{Bio}{Information}
 
@@ -211,4 +211,246 @@ $$
   \item Therefore, merge sort asymptotically beats insertion sort in the worst case.
   \item In practice, merge sort beats insertion sort for $n > 30$ or so.            
 \end{itemize}
+\chapter{Asymptotic Notation \& Recurrences}
+\begin{introduction}
+  \item $O-, \Omega-$, and $\Theta-$ notation
+  \item Substitution method
+  \item Iterating the recurrence
+  \item Recursion tree
+  \item Master method
+\end{introduction}
+\section{Asymptotic notation}
+\subsection{$O-$notation (upper bounds)}
+\begin{definition}[$O-$notation (upper bounds)]
+  We write $f(n)=O(g(n))$ if there exist constants $c>0, n_{0}>0$ such that $0 \leq f(n) \leq \operatorname{cg}(n)$ for all $n \geq n_{0}$
+\end{definition}
+\begin{example}
+  $$
+  2 n^{2}=O\left(n^{3}\right) \quad\left(c=1, n_{0}=2\right)
+  $$
+\end{example}
+\begin{note}
+  Notice that in this equation, $2n^2$ are functions not values and the eqal sign is just "one-way" equality.
+  \\Actually, it can be denoted more precisely: 
+  $$
+  2 n^{2} \in O\left(n^{3}\right)
+  $$
+\end{note}
+\begin{note}
+  Convention: A set in a formula representsan anonymous function in the set.
+\end{note}
+\begin{example}
+  $$
+  n^{2}+O(n)=O\left(n^{2}\right)
+  $$
+  means for any $f(n) \in O(n)$,$n^2 + f(n) = h(n)$ for some $h(n) \in O(n^2)$
+\end{example}
+\subsection{$\Omega-$ notation(lower bounds)}
+O-notation is an upper-bound notation. It makes no sense to say $f(n)$ is at least $O(n^2)$.
+
+\begin{definition}[$\Omega-$ notation(lower bounds)]
+  $\Omega(g(n))=\{f(n):$ there exist constants $c>0, n_{0}>0$ such that $0 \leq \operatorname{cg}(n) \leq f(n)$ for all $\left.n \geq n_{0}\right\}$
+\end{definition}
+
+\begin{example}
+  $$
+  \sqrt{n}=\Omega(\lg n) \quad\left(c=1, n_{0}=16\right)
+  $$
+\end{example}
+\subsection{$\Theta-$notation(tight bounds)}
+\begin{definition}[$\Theta-$notation(tight bounds)]
+  $$
+\Theta(g(n))=\mathrm{O}(g(n)) \cap \Omega(g(n))
+$$
+\end{definition}
+\begin{example}
+  $$
+  \frac{1}{2} n^{2}-2 n=\Theta\left(n^{2}\right)
+  $$
+\end{example}
+\subsection{$o-$notation and $\omega$-notation}
+$O$-notation and $\Omega$-notation are like $\leq$ and $\geq$. $o$-notation and $\omega$-notation are like $<$ and $>$.
+\begin{definition}[$o-$notation]
+  $o(g(n))=\{f(n):$ for any constant $c>0$ ,there is a constant $n_{0}>0$ such that $0 \leq f(n)<c g(n)$ for all $\left.n \geq n_{0}\right\}$ 
+\end{definition}
+\begin{example}
+  $$
+2 n^{2}=o\left(n^{3}\right) \quad\left(n_{0}=2 / c\right)
+$$
+\end{example}
+\begin{definition}[$\omega$-notation]
+  $o(g(n))=\{f(n):$ for any constant $c>0$ , there is a constant $n_{0}>0$
+  Such that $0 \leq f(n)<\operatorname{cg}(n)$
+  for all $\left.n \geq n_{0}\right\}$
+\end{definition}
+\begin{example}
+  $$
+  \sqrt{n}=\omega(\lg n) \quad\left(n_{0}=1+1 / c\right)
+  $$
+\end{example}
+\section{Solving recurrences}
+
+The analysis of merge sort from Lecture 1 required us to solve a recurrence.Recurrences are like solving integrals, differential equations, etc. Learn a few tricks.
+
+\subsection{Substitution method}
+\begin{definition}[Substitution method]
+  The most general method:
+  \begin{enumerate}
+    \item Guess the form of the solution.
+    \item Verify by induction.
+    \item Solve for constants.
+  \end{enumerate} 
+\end{definition}
+
+\begin{example}
+  $$
+T(n)=4 T(n / 2)+n
+$$
+\end{example}
+\begin{itemize}
+  \item Assume that $T(1)=\Theta(1)$ .
+  \item Guess $O\left(n^{3}\right)$. (Prove $O$ and $\Omega$ separately.)
+  \item Assume that $T(k) \leq c k^{3}$ for $k<n$
+  \item Prove $T(n) \leq c n^{3}$ by induction. 
+\end{itemize}
+\begin{solution}
+  $$
+  \begin{aligned}
+  T(n) &=4 T(n / 2)+n \\
+  & \leq 4 c(n / 2)^{3}+n \\
+  &=(c / 2) n^{3}+n \\
+  &=c n^{3}-\left((c / 2) n^{3}-n\right) \leftarrow \text { desired - residual }\\
+  & \leq c n^{3} \longleftarrow \text { desired }
+  \end{aligned}
+  $$
+
+  whenever $(c / 2) n^{3}-n \geq 0$ , for example,if $c \geq 2$ and $n \geq 1$
+\end{solution} 
+\begin{note}
+  We must also handle the initial conditions, that is, ground the induction with base cases.
+\end{note}
+\begin{enumerate}
+  \item \textbf{Base}: $T(n)=\Theta(1)$ for all $n<n_{0}$, where $n_{0}$ is a suitable constant.
+  \item For $1 \leq n<n_{0}$, we have  $" \Theta(1) " \leq c n^{3}$, if we pick $c$ big enough.
+\end{enumerate}
+
+\begin{center}
+\textbf{This bound is not tight!}
+\end{center}
+\begin{note}
+  A tighter upper bound? We shall prove that $T(n)=O\left(n^{2}\right)$
+\end{note}
+Assume that $T(k) \leq c k^{2}$ for $k<n$ :
+$$
+\begin{aligned}
+T(n) &=4 T(n / 2)+n \\
+& \leq 4 c(n / 2)^{2}+n \\
+&=c n^{2}+n \\
+&=O\left(n^{2}\right)
+\end{aligned}
+$$
+\begin{center}
+  \textbf{Wrong! We must prove the I.H.($T(k) \leq ck^2$)}
+\end{center}
+$$
+=c n^{2}-(-n)
+$$
+for no choice of $c>0$. Lose!
+\begin{note}
+  \text{IDEA:} Strengthen the inductive hypothesis.(Subtract a low-order term.)
+  $$
+\text { Inductive hypothesis: } T(k) \leq c_{1} k^{2}-c_{2} k \text { for } k<n \text {. }
+$$
+\end{note}
+\begin{solution}
+  $$
+  \begin{aligned}
+  T(n) &=4 T(n / 2)+n \\
+  &=4\left(c_{1}(n / 2)^{2}-c_{2}(n / 2)\right)+n \\
+  &=c_{1} n^{2}-2 c_{2} n+n \\
+  &=c_{1} n^{2}-c_{2} n-\left(c_{2} n-n\right) \\
+  & \leq c_{1} n^{2}-c_{2} n \text { if } c_{2} \geq 1 .
+  \end{aligned}
+  $$
+Pick $c_1$ big enough to handle the initial conditions.
+\end{solution}
+\subsection{Recursion-tree method}
+\begin{itemize}
+  \item A recursion tree models the costs(time)ofa recursive execution of an algorithm.
+
+  \item The recursion-tree method can be unreliable, just like any method that uses ellipses (...) 
+  
+  \item The recursion-tree method promotes intuition, however.
+  \item The recursion tree method is good for generating guesses for the substitution method.
+\end{itemize}
+\begin{example}
+  Solve 
+  $$
+  T(n)=T(n / 4)+T(n / 2)+n^{2}
+  $$
+  %todo recursion-tree-pic
+\end{example}
+\subsection{The master method}
+The master method applies to recurrences of the form
+$$
+T(n)=a T(n / b)+f(n)
+$$
+
+where $a \geq 1, b>1$ and $f$ is asymptotically positive.
+\begin{theorem}[Three common cases]
+  Compare $f(n)$ with $n^{\log _{b} a}$ :
+  \begin{enumerate}
+    \item $f(n)=O\left(n^{\log _{b} a-\varepsilon}\right)$ for some constant $\varepsilon>0$
+    \begin{itemize}
+      \item $f(n)$ grows polynomially slower than $n^{\log _{b} a}$ (by an $n^{\varepsilon}$ factor).
+    \end{itemize}
+    \textbf{Solution:}$$
+    T(n)=\Theta\left(n^{\log _{b} a}\right)
+    $$
+    \item $f(n)=\Theta\left(n^{\log _{b} a} \lg ^{k} n\right)$ for some constant $k \geq 0$
+    \begin{itemize}
+      \item $f(n)$ and $n^{\log _{b} a}$ grow at similar rates.
+    \end{itemize}
+    \textbf{Solution:}
+    $$
+    T(n)=\Theta\left(n^{\log _{b} a} \lg ^{k+1} n\right)
+    $$
+    \item $f(n)=\Omega\left(n^{\log _{b} a+\varepsilon}\right)$ for some constant $\varepsilon>0$
+    \begin{itemize}
+      \item $f(n)$ grows polynomially faster than $n^{\log _{b} a}$ (by an $n^{\varepsilon}$ factor),and $f(n)$ satisfies the regularity condition that $a f(n / b) \leq c f(n)$ for some constant $c<1$
+    \end{itemize}
+    \textbf{Solution:}
+    $$
+    T(n)=\Theta(f(n))
+    $$ 
+  \end{enumerate}
+\end{theorem}
+\begin{example}
+  $$
+T(n)=4 T(n / 2)+n^{3}
+$$
+\end{example}
+\begin{solution}
+  $$a=4, b=2 \Rightarrow n^{\log _{b} a}=n^{2} ; f(n)=n^{3}$$
+
+  \textbf{CASE 3}: $f(n)=\Omega\left(n^{2+\varepsilon}\right)$ for $\varepsilon=1$ and $4(n / 2)^{3} \leq c n^{3}$ (reg. cond.) for $c=1 / 2$.
+  $$
+\therefore T(n)=\Theta\left(n^{3}\right)
+$$
+\end{solution}
+\begin{example}
+  $$
+  T(n)=4 T(n / 2)+n^{2} / \lg n
+  $$
+\end{example}
+\begin{solution}
+  $$a=4, b=2 \Rightarrow n^{\log _{b} a}=n^{2} ; f(n)=n^{2} / \lg n$$
+
+  \textbf{Master method does not apply.} In particular, for every constant $\varepsilon>0$, we have $n^{\varepsilon}=\omega(\lg n)$.
+
+\end{solution}
+
+\subsubsection{Idea of master theorem}
+%todo recursion-tree-master-theorem'
+
 \end{document}

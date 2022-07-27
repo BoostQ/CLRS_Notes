@@ -1,0 +1,214 @@
+\documentclass[11pt]{elegantbook}
+\usepackage{import}
+\usepackage{xifthen}
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+
+\title{CLRS Notes}
+\subtitle{Classic Elegant\LaTeX{} Template}
+
+\author{Haopeng Li}
+\institute{Elegant\LaTeX{} Program}
+\date{\today}
+%\bioinfo{Bio}{Information}
+
+%\extrainfo{Victory won\rq t come to us unless we go to it. }
+
+\logo{logo-blue.png}
+\cover{cover.jpg}
+
+% modify the color in the middle of titlepage
+\definecolor{customcolor}{RGB}{32,178,170}
+\colorlet{coverlinecolor}{customcolor}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+\tableofcontents
+
+\mainmatter
+
+\chapter{Analysis of Algorithms}
+\begin{introduction}
+  \item Insertion sort
+  \item Asymptotic analysis
+  \item Merge sort
+  \item Recurrences
+\end{introduction}
+\begin{definition}[Algorithms]
+  The theoretical study of computer-program performance and resource usage.
+\end{definition}
+
+\begin{note}
+  Why study algorithms and performance?
+  \begin{itemize}
+    \item Algorithms help us to understand scalability.
+    \item Performance often draws the line between what is feasible and what is impossible.
+    \item Algorithmic mathematics provides a language for talking about program behavior.
+    \item Performance is the currency of computing.
+    \item The lessons of program performance generalize to other computing resources.
+    \item Speed is fun!
+  \end{itemize}
+\end{note}
+\section{The problem of sorting}
+\begin{problem}[(The problem of sorting)]
+\begin{itemize}
+  \item Input:sequence $<a_{1},a_{2},\cdots,a_{n}>$ of numbers.
+  \item Output: permutation $<a_{1}^{\prime},a_2^{\prime},\cdots,a_{n}^{\prime}>$ such that $a_{1}^{\prime} \leq a_{2}^{\prime} \leq \cdots \leq a_{n}^{\prime}$
+\end{itemize}
+\end{problem}
+\section{Insertion Sort}
+\begin{lstlisting}{pseudocode}
+    Insertion-Sort(A,n)
+      for j <- 2 to n
+        do key <- A[j]
+          i <- j - 1
+          while i > 0 and A[i] > key
+            do A[i+1] <- A[i]
+            i<- i-1
+          A[i+1] = key
+\end{lstlisting}
+
+%todo pic-Insertion-Sort
+
+\section{Running time}
+
+\begin{itemize}
+  \item The running time depends on the input:an already sorted sequence is easier to sort.
+  \item Parameterize the running time by the size of the input,since short sequences are easier to sort than long ones.
+  \item Generally,we seek upper bounds on the running time,because everybody likes a guarantee.
+\end{itemize}
+
+\subsection{Kinds of Analysis}
+
+
+
+\begin{definition}[Worst-Case(usually)]
+  $T(n)=$ maximum time of algorithm on any input of size $n$.
+\end{definition}
+  
+\begin{definition}[Average-Case(Sometimes)]
+  \begin{itemize}
+    \item $T(n)=$ expected time of algorithm over all inputs of size $n$.
+    \item Need assumption of statistical distribution of inputs.
+  \end{itemize}
+  
+\end{definition}
+\begin{definition}[Best-case: (bogus)]
+  Cheat with a slow algorithm that works fast on some input.
+\end{definition}
+\begin{note}
+  What is insertion sort’s worst-case time?
+\end{note}
+It depends on the speed of our computer:
+\begin{itemize}
+  \item relative speed (on the same machine),
+  \item absolute speed (on different machines).
+\end{itemize}
+
+\begin{note}
+  BIG IDEA:
+\end{note}
+\begin{enumerate}
+  \item Ignore machine-dependent constants.
+  \item look at the growth of $T(n)$ as $n\to \infty$
+  \item "Asymptotic Analysis"
+\end{enumerate}
+\subsection{$\Theta$-Notation}
+\begin{definition}[$\Theta$-Notation]
+  $\Theta(g(n))=\left\{f(n):\right.$ there exist positive constants $c_{1}, c_{2}$, and $n_{0}$ such that $0 \leq c_{1} g(n) \leq f(n) \leq c_{2} g(n)$ for all $\left.n \geq n_{0}\right\}$
+\end{definition}
+\begin{note}
+  Engineering:Drop low-order terms; Ignore leading constants.
+\end{note}
+\begin{example}
+  $$
+3 n^{3}+90 n^{2}-5 n+6046=\Theta\left(n^{3}\right)
+$$
+\end{example}
+\subsection{Asymptotic performance}
+\begin{note}
+  When $n$ gets large enough, a $\Theta\left(n^{2}\right)$ algorithm always beats a $\Theta\left(n^{3}\right)$ algorithm.
+\end{note}
+
+%todo Pic-Asym-Performance
+
+\begin{note}
+  \begin{itemize}
+    \item We shouldn't ignore asymptotically slower algorithms, however.
+    \item Real-world design situations often call for a careful balancing of engineering objectives. 
+    \item Asymptotic analysis is a useful tool to help to structure our thinking.
+  \end{itemize}
+\end{note}
+\subsection{Insertion sort analysis}
+\subsubsection*{Worst case}
+Input reverse sorted
+$$
+T(n)=\sum_{j=2}^{n} \Theta(j)=\Theta\left(n^{2}\right)
+$$
+\subsubsection*{Average case}
+All permutations equally likely.
+$$
+T(n)=\sum_{j=2}^{n} \Theta(j / 2)=\Theta\left(n^{2}\right)
+$$
+
+\begin{note}
+  Is insertion sort a fast sorting algorithm?
+  \begin{itemize}
+    \item Moderately so, for small $n$
+    \item Not at all, for large $n$
+  \end{itemize}
+\end{note}
+
+\section{Merge Sort}
+
+\begin{lstlisting}[mathescape=true]
+  Merge-Sort A[1..n]
+    1. If n = 1,done
+    2. Recurisively sort $A[1 \ldots\lceil n / 2\rceil]$ and $A[\lceil n / 2\rceil+1 \ldots n]$
+    3. Merge the 2 sorted lists.
+\end{lstlisting}
+\begin{note}
+  Key subroutine: MERGE
+\end{note}  
+\subsection{Analyzing Merge Sort}
+Time $=\Theta(n)$ to merge a total of $n$ elements (linear time).
+$$
+\begin{array}{l|l}
+T(n) & \text { MERGE-SORT } A[1 \ldots n] \\
+\Theta(1) & \text { 1. If } n=1, \text { done. } \\
+2 T(n / 2) & \text { 2. Recursively sort } A[1 \ldots\lceil n / 2\rceil] \\
+& \quad \text { and } A[\lceil n / 2\rceil+1 \ldots n] . \\
+\Theta(n) & \text { 3. "Merge" the } 2 \text { sorted lists }
+\end{array}
+$$
+\begin{note}
+  \textbf{Sloppiness}: $2T(n/2)$ should be $T(\lceil n / 2\rceil)+T(\lfloor n / 2\rfloor)$, but it turns out not to matter asymptotically.
+\end{note}
+\subsection{Recurrence for merge sort}
+$$
+T(n)=\left\{\begin{array}{l}
+\Theta(1) \text { if } n=1 \\
+2 T(n / 2)+\Theta(n) \text { if } n>1
+\end{array}\right.
+$$
+\begin{note}
+  \begin{itemize}
+    \item We shall usually omit stating the base case when $T(n)=\Theta(1)$ for sufficiently small $n$, but only when it has no effect on the asymptotic solution to the recurrence. 
+    \item CLRS and Lecture 2 provide several ways to find a good upper bound on $T(n)$.
+  \end{itemize}
+\end{note}
+\subsection{Recursion tree}
+\begin{example}
+  Solve $T(n)=2 T(n / 2)+c n$, where $c>0$ is constant.
+\end{example}
+\subsection{Conclusions}
+\begin{itemize}
+  \item $\Theta(n \lg n)$ grows more slowly than $\Theta\left(n^{2}\right)$
+  \item Therefore, merge sort asymptotically beats insertion sort in the worst case.
+  \item In practice, merge sort beats insertion sort for $n > 30$ or so.            
+\end{itemize}
+\end{document}
